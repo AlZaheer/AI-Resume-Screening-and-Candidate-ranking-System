@@ -22,7 +22,7 @@ def extract_text_from_pdf(file):
     return text
 
 # Function to rank resumes based on job description
-'''def rank_resumes(job_description, resumes):
+def rank_resumes(job_description, resumes):
     # Combine job description with resumes
     documents = [job_description] + resumes
     vectorizer = TfidfVectorizer().fit_transform(documents)
@@ -32,27 +32,9 @@ def extract_text_from_pdf(file):
     job_description_vector = vectors[0]
     resume_vectors = vectors[1:]
     cosine_similarities = cosine_similarity([job_description_vector], resume_vectors).flatten()
-    return cosine_similarities'''
+    return cosine_similarities
 
-def rank_resumes(job_description, resumes):
-    documents = []
 
-    documents.append(str(job_description))
-
-    for resume in resumes:
-        documents.append(str(resume))
-
-    st.write("Documents:")
-    st.write(documents)
-
-    st.stop()   # Stop here so we can inspect the documents
-
-    vectorizer = TfidfVectorizer()
-    vectors = vectorizer.fit_transform(documents)
-
-    scores = cosine_similarity(vectors[0], vectors[1:]).flatten()
-
-    return scores
 
 # Function to generate a reason using the new GenAI SDK syntax
 def generate_reason(job_description, resume_text):
