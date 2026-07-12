@@ -119,3 +119,4 @@ if uploaded_files and job_description:
         for index, row in top_results.iterrows():
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
                 st.write(row["Reason"])
+                
