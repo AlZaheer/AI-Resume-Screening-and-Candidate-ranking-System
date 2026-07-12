@@ -120,14 +120,191 @@ if uploaded_files and job_description:
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
                 st.write(row["Reason"])'''
 import streamlit as st
+from PyPDF2 import PdfReader
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 from google import genai
 
-st.write("Before secrets")
-
+# -------------------------------
+# Gemini Setup
+# -------------------------------
 API_KEY = st.secrets["GEMINI_API_KEY"]
-
-st.write("After secrets")
-
 client = genai.Client(api_key=API_KEY)
 
-st.write("Client created")
+# -------------------------------
+# PDF Text Extraction
+# -------------------------------
+def extract_text_from_pdf(file):
+    st.write("➡️ Inside extract_text_from_pdf()")
+
+    pdf = PdfReader(file)
+    st.write(f"✅ PDF opened successfully ({len(pdf.pages)} pages)")
+
+    text = ""
+
+    for i, page in enumerate(pdf.pages):
+        st.write(f"Reading page {i+1}")
+
+        page_text = page.extract_text()
+
+        if page_text:
+            text += page_text
+
+    st.write(f"✅ Extracted {len(text)} characters")
+
+    return text
+
+# -------------------------------
+# TF-IDF Ranking
+# -------------------------------
+def rank_resumes(job_description, resumes):
+
+    st.write("➡️ Entered rank_resumes()")
+
+    documents = [job_description] + resumes
+
+    st.write(f"Documents: {len(documents)}")
+
+    vectorizer = TfidfVectorizer()
+
+    st.write("✅ Vectorizer created")
+
+    vectors = vectorizer.fit_transform(documents)
+
+    st.write("✅ fit_transform completed")
+
+    st.write(f"Shape: {vectors.shape}")
+
+    job_vector = vectors[0]
+    resume_vectors = vectors[1:]
+
+    st.write("Computing cosine similarity...")
+
+    scores = cosine_similarity(job_vector, resume_vectors).flatten()
+
+    st.write("✅ Cosine similarity completed")
+
+    return scores
+
+# -------------------------------
+# Gemini Reason
+# -------------------------------
+def generate_reason(job_description, resume_text):
+
+    prompt = f"""
+    You are an expert technical recruiter.
+
+    Job Description:
+    {job_description}
+
+    Resume:
+    {resume_text[:3000]}
+
+    Explain in one sentence why this candidate is suitable.
+    """
+
+    response = client.models.generate_content(
+        model="gemini-3.1-flash-lite",
+        contents=prompt,
+    )
+
+    return response.text
+
+# -------------------------------
+# UI
+# -------------------------------
+st.title("AI Resume Screening")
+
+job_description = st.text_area("Job Description")
+
+uploaded_files = st.file_uploader(
+    "Upload Resume PDFs",
+    type=["pdf"],
+    accept_multiple_files=True,
+)
+
+top_n = st.number_input(
+    "Top Candidates",
+    min_value=1,
+    max_value=100,
+    value=10,
+)
+
+# -------------------------------
+# Main
+# -------------------------------
+if uploaded_files and job_description:
+
+    st.write("1️⃣ Uploaded files detected")
+
+    resumes = []
+    resume_names = []
+
+    for file in uploaded_files:
+
+        st.write(f"2️⃣ Processing {file.name}")
+
+        text = extract_text_from_pdf(file)
+
+        st.write(f"3️⃣ Resume length = {len(text)}")
+
+        resumes.append(text)
+        resume_names.append(file.name)
+
+    st.write("4️⃣ Finished reading PDFs")
+
+    scores = rank_resumes(job_description, resumes)
+
+    st.write("5️⃣ Ranking completed")
+
+    results = pd.DataFrame(
+        {
+            "Resume": resume_names,
+            "Score": scores,
+        }
+    )
+
+    st.write("6️⃣ DataFrame created")
+
+    results = results.sort_values(
+        by="Score",
+        ascending=False,
+    )
+
+    st.write("7️⃣ DataFrame sorted")
+
+    top_results = results.head(top_n).copy()
+
+    st.write("8️⃣ Top results selected")
+
+    st.dataframe(top_results)
+
+    if st.button("Generate AI Reason"):
+
+        st.write("9️⃣ Starting Gemini")
+
+        reasons = []
+
+        for _, row in top_results.iterrows():
+
+            idx = resume_names.index(row["Resume"])
+
+            reason = generate_reason(
+                job_description,
+                resumes[idx],
+            )
+
+            reasons.append(reason)
+
+        top_results["Reason"] = reasons
+
+        st.write("🔟 Gemini completed")
+
+        st.dataframe(top_results)
+
+        for _, row in top_results.iterrows():
+
+            with st.expander(row["Resume"]):
+
+                st.write(row["Reason"])
