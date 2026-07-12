@@ -1,4 +1,4 @@
-'''import streamlit as st
+import streamlit as st
 from PyPDF2 import PdfReader
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -118,13 +118,4 @@ if uploaded_files and job_description:
         st.subheader("💡 Deep AI Insights")
         for index, row in top_results.iterrows():
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
-                st.write(row["Reason"])'''
-import streamlit as st
-import pandas as pd
-
-df = pd.DataFrame({
-    "Resume": ["A"],
-    "Score": [0.95]
-})
-
-st.dataframe(df)
+                st.write(row["Reason"])
