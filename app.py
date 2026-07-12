@@ -1,4 +1,4 @@
-import streamlit as st
+'''import streamlit as st
 from PyPDF2 import PdfReader
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -118,4 +118,16 @@ if uploaded_files and job_description:
         st.subheader("💡 Deep AI Insights")
         for index, row in top_results.iterrows():
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
-                st.write(row["Reason"])
+                st.write(row["Reason"])'''
+import streamlit as st
+from google import genai
+
+st.write("Before secrets")
+
+API_KEY = st.secrets["GEMINI_API_KEY"]
+
+st.write("After secrets")
+
+client = genai.Client(api_key=API_KEY)
+
+st.write("Client created")
