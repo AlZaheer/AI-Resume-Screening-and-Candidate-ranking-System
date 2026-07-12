@@ -121,16 +121,15 @@ if uploaded_files and job_description:
                 st.write(row["Reason"])'''
 import streamlit as st
 from PyPDF2 import PdfReader
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
-st.title("PDF Test")
+uploaded = st.file_uploader("Upload PDF", type="pdf")
 
-uploaded = st.file_uploader("Upload a PDF", type="pdf")
+job = st.text_area("Job Description")
 
-if uploaded:
-    st.write("Uploaded:", uploaded.name)
-
+if uploaded and job:
     pdf = PdfReader(uploaded)
-    st.write("Pages:", len(pdf.pages))
 
     text = ""
     for page in pdf.pages:
@@ -138,5 +137,16 @@ if uploaded:
         if t:
             text += t
 
-    st.write("Characters extracted:", len(text))
-                
+    st.write("Text extracted")
+
+    docs = [job, text]
+
+    st.write("Running TF-IDF...")
+
+    vectors = TfidfVectorizer().fit_transform(docs)
+
+    st.write("TF-IDF complete")
+
+    scores = cosine_similarity(vectors[0], vectors[1:]).flatten()
+
+    st.write(scores)
