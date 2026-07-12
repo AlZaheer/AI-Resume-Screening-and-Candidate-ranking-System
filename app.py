@@ -119,8 +119,10 @@ if uploaded_files and job_description:
         for index, row in top_results.iterrows():
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
                 st.write(row["Reason"])'''
-import streamlit as st
+import scipy
+import numpy
 import sklearn
 
-st.write("Hello")
-st.write(sklearn.__version__)
+st.write("NumPy:", numpy.__version__)
+st.write("SciPy:", scipy.__version__)
+st.write("Scikit-learn:", sklearn.__version__)
