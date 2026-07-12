@@ -62,7 +62,7 @@ def rank_resumes(job_description, resumes):
 
     vectorizer = TfidfVectorizer()
 
-    vectors = vectorizer.fit_transform(documents)
+    vectors = vectorizer.st.write(documents)
 
     st.write("TF-IDF completed")
 
