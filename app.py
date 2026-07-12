@@ -120,33 +120,7 @@ if uploaded_files and job_description:
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
                 st.write(row["Reason"])'''
 import streamlit as st
-from PyPDF2 import PdfReader
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
+import sklearn
 
-uploaded = st.file_uploader("Upload PDF", type="pdf")
-
-job = st.text_area("Job Description")
-
-if uploaded and job:
-    pdf = PdfReader(uploaded)
-
-    text = ""
-    for page in pdf.pages:
-        t = page.extract_text()
-        if t:
-            text += t
-
-    st.write("Text extracted")
-
-    docs = [job, text]
-
-    st.write("Running TF-IDF...")
-
-    vectors = TfidfVectorizer().fit_transform(docs)
-
-    st.write("TF-IDF complete")
-
-    scores = cosine_similarity(vectors[0], vectors[1:]).flatten()
-
-    st.write(scores)
+st.write("Hello")
+st.write(sklearn.__version__)
