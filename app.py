@@ -37,34 +37,18 @@ def extract_text_from_pdf(file):
 def rank_resumes(job_description, resumes):
     documents = []
 
-    # Clean Job Description
-    jd = str(job_description).replace("\x00", " ").strip()
-    documents.append(jd)
+    documents.append(str(job_description))
 
-    # Clean each resume
-    for i, resume in enumerate(resumes):
-        resume = str(resume)
+    for resume in resumes:
+        documents.append(str(resume))
 
-        st.write(f"Resume {i+1}")
-        st.write(f"Length: {len(resume)}")
+    st.write("Documents:")
+    st.write(documents)
 
-        # Remove NULL characters
-        resume = resume.replace("\x00", " ")
-
-        # Remove non-printable characters
-        resume = "".join(ch for ch in resume if ch.isprintable() or ch.isspace())
-
-        st.write(f"Cleaned Length: {len(resume)}")
-
-        documents.append(resume)
-
-    st.write("Starting TF-IDF")
+    st.stop()   # Stop here so we can inspect the documents
 
     vectorizer = TfidfVectorizer()
-
-    vectors = vectorizer.st.write(documents)
-
-    st.write("TF-IDF completed")
+    vectors = vectorizer.fit_transform(documents)
 
     scores = cosine_similarity(vectors[0], vectors[1:]).flatten()
 
