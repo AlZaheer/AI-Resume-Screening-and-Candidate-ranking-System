@@ -120,10 +120,23 @@ if uploaded_files and job_description:
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
                 st.write(row["Reason"])'''
 import streamlit as st
-import scipy
-import numpy
-import sklearn
+from sklearn.feature_extraction.text import TfidfVectorizer
 
-st.write("NumPy:", numpy.__version__)
-st.write("SciPy:", scipy.__version__)
-st.write("Scikit-learn:", sklearn.__version__)
+st.write("Before docs")
+
+docs = [
+    "Python Java SQL",
+    "Python SQL Machine Learning"
+]
+
+st.write("Before vectorizer")
+
+vectorizer = TfidfVectorizer()
+
+st.write("Vectorizer created")
+
+vectors = vectorizer.fit_transform(docs)
+
+st.write("fit_transform completed")
+
+st.write(vectors.shape)
