@@ -1,4 +1,4 @@
-import streamlit as st
+'''import streamlit as st
 from PyPDF2 import PdfReader
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -118,5 +118,25 @@ if uploaded_files and job_description:
         st.subheader("💡 Deep AI Insights")
         for index, row in top_results.iterrows():
             with st.expander(f"📄 {row['Resume']} (Score: {row['Score']:.4f})", expanded=True):
-                st.write(row["Reason"])
+                st.write(row["Reason"])'''
+import streamlit as st
+from PyPDF2 import PdfReader
+
+st.title("PDF Test")
+
+uploaded = st.file_uploader("Upload a PDF", type="pdf")
+
+if uploaded:
+    st.write("Uploaded:", uploaded.name)
+
+    pdf = PdfReader(uploaded)
+    st.write("Pages:", len(pdf.pages))
+
+    text = ""
+    for page in pdf.pages:
+        t = page.extract_text()
+        if t:
+            text += t
+
+    st.write("Characters extracted:", len(text))
                 
